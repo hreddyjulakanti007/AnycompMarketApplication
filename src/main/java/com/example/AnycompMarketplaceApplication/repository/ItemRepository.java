@@ -1,10 +1,10 @@
 package com.example.AnycompMarketplaceApplication.repository;
 
 import com.example.AnycompMarketplaceApplication.entity.Item;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
-
 public interface ItemRepository extends JpaRepository<Item, Long> {
-    List<Item> findBySellerId(Long sellerId);
+    Page<Item> findBySellerId(Long sellerId, Pageable pageable);
 }

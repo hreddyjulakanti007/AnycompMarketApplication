@@ -2,6 +2,8 @@ package com.example.AnycompMarketplaceApplication.service;
 
 import com.example.AnycompMarketplaceApplication.entity.Seller;
 import com.example.AnycompMarketplaceApplication.repository.SellerRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,8 +18,8 @@ public class SellerService {
         this.sellerRepository = sellerRepository;
     }
 
-    public List<Seller> getAllSellers() {
-        return sellerRepository.findAll();
+    public Page<Seller> getAllSellers(Pageable pageable) {
+        return sellerRepository.findAll(pageable);
     }
 
     public Optional<Seller> getSellerById(Long id) {

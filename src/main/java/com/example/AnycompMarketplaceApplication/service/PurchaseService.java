@@ -7,6 +7,8 @@ import com.example.AnycompMarketplaceApplication.entity.Purchase;
 import com.example.AnycompMarketplaceApplication.repository.BuyerRepository;
 import com.example.AnycompMarketplaceApplication.repository.ItemRepository;
 import com.example.AnycompMarketplaceApplication.repository.PurchaseRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -63,5 +65,21 @@ public class PurchaseService {
         response.setPurchaseDate(savedPurchase.getPurchaseDate());
 
         return response;
+    }
+
+    // Pagination method for purchases
+    public Page<PurchaseResponse> getAllPurchases(Pageable pageable) {
+        return purchaseRepository.findAll(pageable)
+                .map(purchase -> {
+                    PurchaseResponse response = new PurchaseResponse();
+                    response.setPurchaseId(purchase.getId());
+                    response.setBuyerId(purchase.getBuyer().getId());
+                    response.setBuyerName(purchase.getBuyer().getName());
+                    response.setItemId(purchase.getItem().getId());
+                    response.setItemName(purchase.getItem().getName());
+                    response.setQuantity(purchase.getQuantity());
+                    response.setPurchaseDate(purchase.getPurchaseDate());
+                    return response;
+                });
     }
 }

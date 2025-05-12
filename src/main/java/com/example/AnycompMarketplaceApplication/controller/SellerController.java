@@ -13,8 +13,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+
+import java.util.Optional;  // Ensure this import is present
 
 @RestController
 @RequestMapping("/sellers")
@@ -29,11 +31,12 @@ public class SellerController {
     }
 
     @GetMapping
-    @Operation(summary = "Get all sellers", description = "Returns a list of all sellers")
+    @Operation(summary = "Get all sellers with pagination", description = "Returns a paginated list of all sellers")
     @ApiResponse(responseCode = "200", description = "List of sellers",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = Seller.class)))
-    public List<Seller> getAllSellers() {
-        return sellerService.getAllSellers();
+    public Page<Seller> getAllSellers(@RequestParam(defaultValue = "0") int page,
+                                      @RequestParam(defaultValue = "10") int size) {
+        return sellerService.getAllSellers(PageRequest.of(page, size));
     }
 
     @GetMapping("/{id}")

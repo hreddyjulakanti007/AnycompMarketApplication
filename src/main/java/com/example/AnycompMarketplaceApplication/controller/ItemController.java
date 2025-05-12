@@ -11,11 +11,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/items")
@@ -30,11 +30,11 @@ public class ItemController {
     }
 
     @GetMapping
-    @Operation(summary = "Get all items", description = "Returns a list of all items")
-    @ApiResponse(responseCode = "200", description = "List of items retrieved",
+    @Operation(summary = "Get all items (paginated)", description = "Returns a paginated list of items")
+    @ApiResponse(responseCode = "200", description = "Paginated list of items retrieved",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ItemResponseDTO.class)))
-    public List<ItemResponseDTO> getAllItems() {
-        return itemService.getAllItems();
+    public Page<ItemResponseDTO> getAllItems(@Parameter(hidden = true) Pageable pageable) {
+        return itemService.getAllItems(pageable);
     }
 
     @GetMapping("/{id}")
@@ -54,9 +54,10 @@ public class ItemController {
     @Operation(summary = "Get items by seller ID", description = "Returns all items listed by a specific seller")
     @ApiResponse(responseCode = "200", description = "List of seller's items",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ItemResponseDTO.class)))
-    public List<ItemResponseDTO> getItemsBySeller(
-            @Parameter(description = "Seller ID to retrieve items for") @PathVariable Long sellerId) {
-        return itemService.getItemsBySellerId(sellerId);
+    public ResponseEntity<Page<ItemResponseDTO>> getItemsBySeller(
+            @Parameter(description = "Seller ID to retrieve items for") @PathVariable Long sellerId,
+            @Parameter(hidden = true) Pageable pageable) {
+        return ResponseEntity.ok(itemService.getItemsBySellerId(sellerId, pageable));
     }
 
     @PostMapping("/sellers/{sellerId}")

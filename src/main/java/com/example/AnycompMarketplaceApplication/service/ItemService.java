@@ -6,11 +6,11 @@ import com.example.AnycompMarketplaceApplication.entity.Item;
 import com.example.AnycompMarketplaceApplication.entity.Seller;
 import com.example.AnycompMarketplaceApplication.repository.ItemRepository;
 import com.example.AnycompMarketplaceApplication.repository.SellerRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class ItemService {
@@ -41,23 +41,16 @@ public class ItemService {
         return item;
     }
 
-    public List<ItemResponseDTO> getAllItems() {
-        return itemRepository.findAll()
-                .stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
+    public Page<ItemResponseDTO> getAllItems(Pageable pageable) {
+        return itemRepository.findAll(pageable).map(this::convertToDTO);
     }
 
     public Optional<ItemResponseDTO> getItemById(Long id) {
-        return itemRepository.findById(id)
-                .map(this::convertToDTO);
+        return itemRepository.findById(id).map(this::convertToDTO);
     }
 
-    public List<ItemResponseDTO> getItemsBySellerId(Long sellerId) {
-        return itemRepository.findBySellerId(sellerId)
-                .stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
+    public Page<ItemResponseDTO> getItemsBySellerId(Long sellerId, Pageable pageable) {
+        return itemRepository.findBySellerId(sellerId, pageable).map(this::convertToDTO);
     }
 
     public ItemResponseDTO addItem(Long sellerId, ItemRequestDTO itemDTO) {

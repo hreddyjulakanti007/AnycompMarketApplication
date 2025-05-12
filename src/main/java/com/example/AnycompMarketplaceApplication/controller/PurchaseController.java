@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,5 +53,19 @@ public class PurchaseController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(null);
         }
+    }
+
+    @GetMapping
+    @Operation(
+            summary = "Get all purchases (paginated)",
+            description = "Returns a paginated list of all purchases"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Paginated list of purchases",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = PurchaseResponse.class)))
+    })
+    public ResponseEntity<Page<PurchaseResponse>> getAllPurchases(Pageable pageable) {
+        Page<PurchaseResponse> purchases = purchaseService.getAllPurchases(pageable);
+        return ResponseEntity.ok(purchases);
     }
 }

@@ -10,14 +10,15 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping({"/buyers","/"})
+@RequestMapping({"/buyers", "/"})
 @Tag(name = "Buyer Management", description = "CRUD operations for buyers")
 public class BuyerController {
 
@@ -28,9 +29,9 @@ public class BuyerController {
     }
 
     @GetMapping
-    @Operation(summary = "Get all buyers", description = "Returns a list of all buyers")
-    public List<Buyer> getAllBuyers() {
-        return buyerService.getAllBuyers();
+    @Operation(summary = "Get all buyers (paginated)", description = "Returns a paginated list of buyers")
+    public Page<Buyer> getAllBuyers(@Parameter(hidden = true) Pageable pageable) {
+        return buyerService.getAllBuyers(pageable);
     }
 
     @GetMapping("/{id}")
@@ -39,8 +40,7 @@ public class BuyerController {
             @ApiResponse(responseCode = "200", description = "Found the buyer", content = @Content(schema = @Schema(implementation = Buyer.class))),
             @ApiResponse(responseCode = "404", description = "Buyer not found", content = @Content)
     })
-    public ResponseEntity<Buyer> getBuyerById(
-            @Parameter(description = "ID of the buyer to retrieve") @PathVariable Long id) {
+    public ResponseEntity<Buyer> getBuyerById(@PathVariable Long id) {
         Optional<Buyer> buyer = buyerService.getBuyerById(id);
         return buyer.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
@@ -48,9 +48,7 @@ public class BuyerController {
     @PostMapping
     @Operation(summary = "Create a new buyer", description = "Adds a new buyer to the system")
     @ApiResponse(responseCode = "200", description = "Buyer created", content = @Content(schema = @Schema(implementation = Buyer.class)))
-    public Buyer createBuyer(
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Buyer object to be created", required = true, content = @Content(schema = @Schema(implementation = Buyer.class)))
-            @RequestBody Buyer buyer) {
+    public Buyer createBuyer(@RequestBody Buyer buyer) {
         return buyerService.createBuyer(buyer);
     }
 
@@ -60,10 +58,7 @@ public class BuyerController {
             @ApiResponse(responseCode = "200", description = "Buyer updated", content = @Content(schema = @Schema(implementation = Buyer.class))),
             @ApiResponse(responseCode = "404", description = "Buyer not found", content = @Content)
     })
-    public ResponseEntity<Buyer> updateBuyer(
-            @Parameter(description = "ID of the buyer to update") @PathVariable Long id,
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Updated buyer object", required = true, content = @Content(schema = @Schema(implementation = Buyer.class)))
-            @RequestBody Buyer buyer) {
+    public ResponseEntity<Buyer> updateBuyer(@PathVariable Long id, @RequestBody Buyer buyer) {
         Optional<Buyer> existingBuyer = buyerService.getBuyerById(id);
         if (existingBuyer.isPresent()) {
             Buyer updatedBuyer = buyerService.updateBuyer(id, buyer);
@@ -79,8 +74,7 @@ public class BuyerController {
             @ApiResponse(responseCode = "204", description = "Buyer deleted", content = @Content),
             @ApiResponse(responseCode = "404", description = "Buyer not found", content = @Content)
     })
-    public ResponseEntity<Void> deleteBuyer(
-            @Parameter(description = "ID of the buyer to delete") @PathVariable Long id) {
+    public ResponseEntity<Void> deleteBuyer(@PathVariable Long id) {
         Optional<Buyer> existingBuyer = buyerService.getBuyerById(id);
         if (existingBuyer.isPresent()) {
             buyerService.deleteBuyer(id);
